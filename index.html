@@ -2,17 +2,17 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Быстрый сканер</title>
+  <title>Сканер</title>
 
-  <!-- более быстрый режим -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
     body {
+      margin: 0;
       font-family: Arial;
-      text-align: center;
       background: #111;
       color: white;
+      text-align: center;
     }
 
     #reader {
@@ -21,8 +21,17 @@
       margin: auto;
     }
 
-    h2 {
-      margin-top: 20px;
+    #siteView {
+      display: none;
+      width: 100%;
+      height: 100vh;
+      border: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
     }
   </style>
 </head>
@@ -33,43 +42,50 @@
 
 <div id="reader"></div>
 
+<iframe id="siteView"></iframe>
+
+<button onclick="backToScanner()">← Назад к сканеру</button>
+
 <script>
 let lastScan = "";
 let scanCooldown = false;
 
 function onScanSuccess(decodedText) {
-
-  // защита от повторных сканов
   if (decodedText === lastScan || scanCooldown) return;
 
   lastScan = decodedText;
   scanCooldown = true;
 
-  console.log("Скан:", decodedText);
-
-  // 🔊 звук (как в норм сканере)
   let beep = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
   beep.play();
 
-  // 🚀 сразу открываем сайт
   let url = "https://milgreta.lt/index.php?route=product/search&search=" + decodedText;
-  window.location.href = url;
 
-  // пауза чтобы не дергалось
+  // показываем сайт внутри
+  document.getElementById("reader").style.display = "none";
+  let frame = document.getElementById("siteView");
+  frame.style.display = "block";
+  frame.src = url;
+
   setTimeout(() => {
     scanCooldown = false;
   }, 2000);
 }
 
-// ⚡ быстрые настройки
+function backToScanner() {
+  document.getElementById("siteView").style.display = "none";
+  document.getElementById("reader").style.display = "block";
+}
+
+// быстрые настройки
 let scanner = new Html5QrcodeScanner(
   "reader",
   {
-    fps: 25, // быстрее
-    qrbox: { width: 300, height: 120 }, // под штрихкод
-    aspectRatio: 1.777, // широкая область
+    fps: 25,
+    qrbox: { width: 300, height: 120 },
+    aspectRatio: 1.777,
     experimentalFeatures: {
-      useBarCodeDetectorIfSupported: true // ключ к скорости
+      useBarCodeDetectorIfSupported: true
     }
   }
 );
