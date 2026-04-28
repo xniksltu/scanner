@@ -2,60 +2,79 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Сканер товаров</title>
+  <title>Быстрый сканер</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <!-- более быстрый режим -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      background: black;
+      font-family: Arial;
+      text-align: center;
+      background: #111;
+      color: white;
     }
 
     #reader {
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      max-width: 400px;
+      margin: auto;
+    }
+
+    h2 {
+      margin-top: 20px;
     }
   </style>
 </head>
 
 <body>
 
+<h2>Сканируй штрих-код</h2>
+
 <div id="reader"></div>
 
 <script>
-const html5QrCode = new Html5Qrcode("reader");
+let lastScan = "";
+let scanCooldown = false;
 
-function startScanner() {
-  html5QrCode.start(
-    { facingMode: "environment" }, // задняя камера
-    {
-      fps: 15,
-      qrbox: function(viewfinderWidth, viewfinderHeight) {
-        let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-        return {
-          width: minEdge * 0.8,
-          height: minEdge * 0.4
-        };
-      }
-    },
-    (decodedText) => {
+function onScanSuccess(decodedText) {
 
-      let url = "https://milgreta.lt/index.php?route=product/search&search=" + decodedText;
+  // защита от повторных сканов
+  if (decodedText === lastScan || scanCooldown) return;
 
-      window.location.href = url;
-    },
-    (error) => {
-      // игнорируем ошибки
-    }
-  );
+  lastScan = decodedText;
+  scanCooldown = true;
+
+  console.log("Скан:", decodedText);
+
+  // 🔊 звук (как в норм сканере)
+  let beep = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+  beep.play();
+
+  // 🚀 сразу открываем сайт
+  let url = "https://milgreta.lt/index.php?route=product/search&search=" + decodedText;
+  window.location.href = url;
+
+  // пауза чтобы не дергалось
+  setTimeout(() => {
+    scanCooldown = false;
+  }, 2000);
 }
 
-// сразу запускаем
-startScanner();
+// ⚡ быстрые настройки
+let scanner = new Html5QrcodeScanner(
+  "reader",
+  {
+    fps: 25, // быстрее
+    qrbox: { width: 300, height: 120 }, // под штрихкод
+    aspectRatio: 1.777, // широкая область
+    experimentalFeatures: {
+      useBarCodeDetectorIfSupported: true // ключ к скорости
+    }
+  }
+);
+
+scanner.render(onScanSuccess);
 </script>
 
 </body>
