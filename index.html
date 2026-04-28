@@ -3,27 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <title>Сканер товаров</title>
+
+  <!-- 📱 адаптация под телефон -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      margin: 0;
+      padding: 10px;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    #reader {
+      width: 100%;
+      max-width: 100%;
+      margin: auto;
+    }
+
+    /* увеличиваем кнопки */
+    button {
+      font-size: 18px !important;
+      padding: 10px !important;
+    }
+
+    select {
+      font-size: 16px !important;
+      padding: 8px !important;
+    }
+  </style>
 </head>
+
 <body>
 
 <h2>Сканируй товар</h2>
 
-<div id="reader" style="width:100%; max-width:400px;"></div>
+<div id="reader"></div>
 
 <script>
 function onScanSuccess(decodedText) {
 
   let url = "https://milgreta.lt/index.php?route=product/search&search=" + decodedText;
 
-  // открываем сайт
-  window.open(url, "_blank");
+  // 👉 переход без подтверждения
+  window.location.href = url;
 }
 
 // запуск сканера
 let scanner = new Html5QrcodeScanner(
   "reader",
-  { fps: 10, qrbox: 250 }
+  {
+    fps: 10,
+    qrbox: { width: 250, height: 120 }
+  }
 );
 
 scanner.render(onScanSuccess);
