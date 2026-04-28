@@ -4,20 +4,76 @@
   <meta charset="UTF-8">
   <title>Сканер товаров</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding: 10px;
+    }
+
+    #reader {
+      margin: auto;
+      max-width: 350px;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #f5f5f5;
+    }
+
+    .product {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .stock {
+      font-size: 18px;
+      margin: 5px 0;
+    }
+
+    .vilnius {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
 </head>
+
 <body>
 
 <h2>Сканируй товар</h2>
 
-<div id="reader" style="width:100%; max-width:400px;"></div>
+<div id="reader"></div>
+
+<div id="result">
+  <div class="product">Ожидание сканирования...</div>
+</div>
 
 <script>
-function onScanSuccess(decodedText) {
+function onScanSuccess(code) {
 
-  let url = "https://milgreta.lt/index.php?route=product/search&search=" + decodedText;
+  fetch("http://192.168.1.106:5000/scan?ean=" + code)
+    .then(res => res.json())
+    .then(data => {
 
-  // открываем сайт
-  window.open(url, "_blank");
+      let html = `<div class="product">${data.product}</div>`;
+
+      for (let city in data.stock) {
+
+        let value = data.stock[city];
+
+        if (city.includes("Vilniuje")) {
+          html += `<div class="stock vilnius">${city}: ${value}</div>`;
+        } else {
+          html += `<div class="stock">${city}: ${value}</div>`;
+        }
+      }
+
+      document.getElementById("result").innerHTML = html;
+    });
 }
 
 // запуск сканера
