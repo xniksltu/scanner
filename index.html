@@ -9,12 +9,12 @@
 
 <h2>Сканируй товар</h2>
 
-<div id="reader" style="width:100%; max-width:400px; margin:auto;"></div>
+<div id="reader" style="width:100%; max-width:400px;"></div>
 
 <script>
-function onScanSuccess(code) {
+function onScanSuccess(decodedText) {
 
-  let url = "https://milgreta.lt/index.php?route=product/search&search=" + code;
+  let url = "https://milgreta.lt/index.php?route=product/search&search=" + decodedText;
 
   // открываем сайт
   window.open(url, "_blank");
@@ -23,10 +23,7 @@ function onScanSuccess(code) {
 // запуск сканера
 let scanner = new Html5QrcodeScanner(
   "reader",
-  {
-    fps: 10,
-    qrbox: 250
-  }
+  { fps: 10, qrbox: 250 }
 );
 
 scanner.render(onScanSuccess);
