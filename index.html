@@ -34,11 +34,6 @@
       font-size: 18px;
       margin: 5px 0;
     }
-
-    .vilnius {
-      color: green;
-      font-weight: bold;
-    }
   </style>
 </head>
 
@@ -53,7 +48,13 @@
 </div>
 
 <script>
+
+let scanner;
+
 function onScanSuccess(code) {
+
+  // остановить сканер после считывания
+  scanner.clear();
 
   fetch("http://192.168.1.106:5000/scan?ean=" + code)
     .then(res => res.json())
@@ -62,27 +63,28 @@ function onScanSuccess(code) {
       let html = `<div class="product">${data.product}</div>`;
 
       for (let city in data.stock) {
-
-        let value = data.stock[city];
-
-        if (city.includes("Vilniuje")) {
-          html += `<div class="stock vilnius">${city}: ${value}</div>`;
-        } else {
-          html += `<div class="stock">${city}: ${value}</div>`;
-        }
+        html += `<div class="stock">${city}: ${data.stock[city]}</div>`;
       }
 
       document.getElementById("result").innerHTML = html;
+    })
+    .catch(() => {
+      document.getElementById("result").innerHTML =
+        "<div class='product'>Ошибка подключения к серверу</div>";
     });
 }
 
 // запуск сканера
-let scanner = new Html5QrcodeScanner(
+scanner = new Html5QrcodeScanner(
   "reader",
-  { fps: 10, qrbox: 250 }
+  {
+    fps: 10,
+    qrbox: 250
+  }
 );
 
 scanner.render(onScanSuccess);
+
 </script>
 
 </body>
