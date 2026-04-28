@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Сканер товаров</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+
+<h2>Сканируй товар</h2>
+
+<div id="reader" style="width:100%; max-width:400px;"></div>
+
+<script>
+function onScanSuccess(decodedText) {
+
+  let url = "https://milgreta.lt/index.php?route=product/search&search=" + decodedText;
+
+  // открываем сайт
+  window.open(url, "_blank");
+}
+
+// запуск сканера
+let scanner = new Html5QrcodeScanner(
+  "reader",
+  { fps: 10, qrbox: 250 }
+);
+
+scanner.render(onScanSuccess);
+</script>
+
+</body>
+</html>
