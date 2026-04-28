@@ -4,78 +4,24 @@
   <meta charset="UTF-8">
   <title>Сканер товаров</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
-
-  <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-      padding: 10px;
-    }
-
-    #reader {
-      margin: auto;
-      max-width: 350px;
-    }
-
-    #result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 10px;
-      background: #f5f5f5;
-    }
-
-    .product {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    .stock {
-      font-size: 18px;
-      margin: 5px 0;
-    }
-  </style>
 </head>
-
 <body>
 
 <h2>Сканируй товар</h2>
 
-<div id="reader"></div>
-
-<div id="result">
-  <div class="product">Ожидание сканирования...</div>
-</div>
+<div id="reader" style="width:100%; max-width:400px; margin:auto;"></div>
 
 <script>
-
-let scanner;
-
 function onScanSuccess(code) {
 
-  // остановить сканер после считывания
-  scanner.clear();
+  let url = "https://milgreta.lt/index.php?route=product/search&search=" + code;
 
-  fetch("http://192.168.1.106:5000/scan?ean=" + code)
-    .then(res => res.json())
-    .then(data => {
-
-      let html = `<div class="product">${data.product}</div>`;
-
-      for (let city in data.stock) {
-        html += `<div class="stock">${city}: ${data.stock[city]}</div>`;
-      }
-
-      document.getElementById("result").innerHTML = html;
-    })
-    .catch(() => {
-      document.getElementById("result").innerHTML =
-        "<div class='product'>Ошибка подключения к серверу</div>";
-    });
+  // открываем сайт
+  window.open(url, "_blank");
 }
 
 // запуск сканера
-scanner = new Html5QrcodeScanner(
+let scanner = new Html5QrcodeScanner(
   "reader",
   {
     fps: 10,
@@ -84,7 +30,6 @@ scanner = new Html5QrcodeScanner(
 );
 
 scanner.render(onScanSuccess);
-
 </script>
 
 </body>
